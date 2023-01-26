@@ -1,0 +1,42 @@
+
+
+class AIPlayer
+{
+	private SetStat("키이름")
+	{
+		파일 입출력 기능
+	}
+}
+	
+
+class HeavyAIPlayer extend AIPlayer implements SetPttern
+{
+	SetStat("Heavy")
+}
+
+class FastAIPlayer extend AIPlayer implements SetPttern
+{
+	SetStat("Fast")
+}
+
+class StrongAIPlayer extend AIPlayer implements SetPattern
+{
+	SetStat("Strong")
+}
+
+
+
+
+interface SetPatten()
+{
+}
+
+class HeavyAIPatten() implements SetPattern
+{
+	if
+}
+
+class FastAIPatten() implements SetPattern
+
+class StrongAIPatten() implements SetPattern
+

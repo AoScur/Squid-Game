@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float moveSpeed = 20f;
+    public float moveSpeed = 5f;
 
     private PlayerInput playerInput;
     private Rigidbody playerRigidbody;
+    private NavMeshAgent playerNavMeshAgent;
+    private NavMeshObstacle playerNavMeshObstacle;
     private Animator playerAnimator;
 
     void Start()
@@ -15,6 +18,8 @@ public class PlayerMovement : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
         playerRigidbody = GetComponent<Rigidbody>();
         playerAnimator = GetComponent<Animator>();
+        playerNavMeshAgent = GetComponent<NavMeshAgent>();
+        playerNavMeshObstacle = GetComponent<NavMeshObstacle>();
     }
 
     private void FixedUpdate()
