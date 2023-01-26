@@ -415,7 +415,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraSpeed: 7
-  player: {fileID: 1260597541406796}
+  player: {fileID: 1339626552}
+--- !u!1 &1339626552 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 901756079086746136, guid: 8ad67786f6d30694b888ebc40012c130, type: 3}
+  m_PrefabInstance: {fileID: 1951345923}
+  m_PrefabAsset: {fileID: 0}
+--- !u!136 &1339626558
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339626552}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.20679788
+  m_Height: 1.9365039
+  m_Direction: 1
+  m_Center: {x: 0.013878301, y: 0.9082606, z: 0}
 --- !u!1 &1509330752
 GameObject:
   m_ObjectHideFlags: 0
@@ -484,26 +503,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1260597541406796 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 901756079086746136, guid: 8ad67786f6d30694b888ebc40012c130, type: 3}
-  m_PrefabInstance: {fileID: 902924317114413652}
-  m_PrefabAsset: {fileID: 0}
---- !u!136 &95509903541816241
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1260597541406796}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.23316771
-  m_Height: 1.9698914
-  m_Direction: 1
-  m_Center: {x: -0.0054453015, y: 0.86260325, z: 0}
---- !u!1001 &902924317114413652
+--- !u!1001 &1951345923
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -513,18 +513,6 @@ PrefabInstance:
     - target: {fileID: 901756079086746136, guid: 8ad67786f6d30694b888ebc40012c130, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 901756079086746136, guid: 8ad67786f6d30694b888ebc40012c130, type: 3}
-      propertyPath: m_Layer
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 901756079086746136, guid: 8ad67786f6d30694b888ebc40012c130, type: 3}
-      propertyPath: m_TagString
-      value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 902924316063121222, guid: 8ad67786f6d30694b888ebc40012c130, type: 3}
-      propertyPath: moveSpeed
-      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 907259891537591618, guid: 8ad67786f6d30694b888ebc40012c130, type: 3}
       propertyPath: m_RootOrder

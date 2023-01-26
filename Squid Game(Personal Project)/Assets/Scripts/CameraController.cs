@@ -5,18 +5,19 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public float cameraSpeed;
+    private Vector3 cameraOffset;
 
     public GameObject player;
 
     private void Start()
     {
         cameraSpeed = player.GetComponent<PlayerMovement>().moveSpeed;
+        cameraOffset = transform.position;
     }
 
     private void Update()
     {
-        Vector3 dir = player.transform.position - this.transform.position;
-        Vector3 moveVector = new Vector3(dir.x * cameraSpeed * Time.deltaTime, dir.y * cameraSpeed * Time.deltaTime, 0.0f);
-        this.transform.Translate(moveVector);
+        Vector3 dir = player.transform.position + cameraOffset;
+        this.transform.position = dir;
     }
 }
