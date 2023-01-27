@@ -24,10 +24,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        playerRigidbody.velocity = new Vector3(playerInput.moveH, 0, playerInput.moveV) *moveSpeed ;
+        playerNavMeshAgent.velocity = new Vector3(playerInput.moveH, 0, playerInput.moveV) *moveSpeed ;
 
-        playerAnimator.SetFloat("MoveH", playerRigidbody.velocity.x);
-        playerAnimator.SetFloat("MoveV", playerRigidbody.velocity.z);
+        playerAnimator.SetFloat("MoveH", playerNavMeshAgent.velocity.x);
+        playerAnimator.SetFloat("MoveV", playerNavMeshAgent.velocity.z);
     }
     
 }

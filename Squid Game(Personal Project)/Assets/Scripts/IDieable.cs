@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IDamageable
+public interface IDieable
 {
-    void OnDamage();
+    void OnDie(Vector3 hitPoint, Vector3 hitNormal);
 }

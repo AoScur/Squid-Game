@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using static UnityEngine.GraphicsBuffer;
 
-public class LivingEntity : MonoBehaviour, IPushable, IDamageable
+public class LivingEntity : MonoBehaviour, IPushable, IDieable
 {
     public enum States
     {
@@ -15,17 +15,14 @@ public class LivingEntity : MonoBehaviour, IPushable, IDamageable
         Chase,
         Push,
         FallDown,
-        Stop,
         Die,
     }
 
     private Rigidbody rb;
+    [HideInInspector]
     public NavMeshAgent agent;
-
-    public float mass;
-    public float speed;
-    public float chaseSpeed;
-    public float power;
+    [HideInInspector]
+    public float mass, speed, chaseSpeed, power;
 
     public bool dead { get; protected set; }
     public event Action onDeath;
@@ -49,12 +46,7 @@ public class LivingEntity : MonoBehaviour, IPushable, IDamageable
         rb.AddForce(force);
     }
 
-    public virtual void OnDamage()
-    {      
-        Die();
-    }
-
-    public virtual void Die()
+    public virtual void OnDie(Vector3 hitPoint, Vector3 hitNormal)
     {
         if (onDeath != null)
         {

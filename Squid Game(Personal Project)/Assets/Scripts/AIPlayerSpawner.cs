@@ -6,12 +6,12 @@ public class AIPlayerSpawner : MonoBehaviour
 {
     public int AIPlayerCount;
 
-    public AIPlayer aiPrefab;
+    public AIPlayer[] aiPrefab;
 
     public AIData[] aiDatas;
     public Transform[] createPoints;
 
-    private List<LivingEntity> targets;
+    private List<LivingEntity> targets = new List<LivingEntity>();
 
     private void Start()
     {
@@ -24,9 +24,12 @@ public class AIPlayerSpawner : MonoBehaviour
     private void CreateAI()
     {
         var point = createPoints[Random.Range(0, createPoints.Length)];
-        var ai = GetComponent<AIPlayer>();
+        var aiType = aiPrefab[Random.Range(0, aiPrefab.Length)];
         var data = aiDatas[Random.Range(0,aiDatas.Length)];
+
+        var ai = Instantiate(aiType, point.position, point.rotation);
         ai.Setup(data);
+        targets.Add(ai);
 
         ai.onDeath += () => targets.Remove(ai);
     }
