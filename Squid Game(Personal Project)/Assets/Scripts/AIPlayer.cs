@@ -20,7 +20,7 @@ public class AIPlayer : LivingEntity
         Strongy,
     }
 
-    
+
 
     private List<GameObject> Alives = new List<GameObject>();
     private Transform target;
@@ -34,7 +34,10 @@ public class AIPlayer : LivingEntity
     public float pushRange;
     private float timer = 0f;
     public float chaseInterval = 0.25f;
-    private bool run = true;
+    private bool run = false;
+    private int index = 0;
+
+    private List<LivingEntity> targets;
 
     [HideInInspector]
     public AIData aiData;
@@ -71,7 +74,6 @@ public class AIPlayer : LivingEntity
                     timer = 0f;
                     agent.speed = chaseSpeed;
                     agent.isStopped = false;
-                    agent.SetDestination(target.position);
                     break;
                 case States.Push:
                     agent.isStopped = true;
@@ -86,75 +88,104 @@ public class AIPlayer : LivingEntity
     private void Awake()
     {
         animator = GetComponent<Animator>();
-        agent = GetComponent<NavMeshAgent>();
         goalLinePos = GameObject.FindWithTag("GoalLine").GetComponent<Transform>();
+        agent = GetComponent<NavMeshAgent>();
+        rb = GetComponent<Rigidbody>();
+        targets = AIPlayerSpawner.targets;
+        //Debug.Log(aiData.name);
     }
 
     private void Start()
     {
         State = States.Idle;
 
-
+        StartCoroutine(StateChange());
     }
 
     private void Update()
     {
-        switch (type)
+
+    }
+
+    private IEnumerator StateChange()
+    {
+        while (true)
         {
-            case AIType.Heavy:
-                {
-                    if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 100)
+            switch (type)
+            {
+                case AIType.Heavy:
                     {
-                        RandomBehavior();
-                        break;
+                        if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 70)
+                        {
+                            RandomBehavior();
+                            //Debug.Log("해비랜덤1");
+                            yield return new WaitForSeconds(Random.value * 3f);
+                            break;
+                        }
+                        else if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 30)
+                        {
+                            RandomBehavior();
+                            //Debug.Log("해비랜덤2");
+                            yield return new WaitForSeconds(Random.value * 3f);
+                            break;
+                        }
+                        else
+                        {
+                            RunOnlyBehavior();
+                            //Debug.Log("해비런온니");
+                            yield return new WaitForSeconds(Random.value * 3f);
+                            break;
+                        }
                     }
-                    else if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 30)
+                case AIType.Speedy:
                     {
-                        RandomBehavior();
-                        break;
+                        if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 70)
+                        {
+                            RunOnlyBehavior();
+                            //Debug.Log("스피디런온니1");
+                            yield return new WaitForSeconds(Random.value * 3f);
+                            break;
+                        }
+                        else if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 30)
+                        {
+                            RandomBehavior();
+                            //Debug.Log("스피디랜덤");
+                            yield return new WaitForSeconds(Random.value * 3f);
+                            break;
+                        }
+                        else
+                        {
+                            RunOnlyBehavior();
+                            //Debug.Log("스피디런온니2");
+                            yield return new WaitForSeconds(Random.value * 3f);
+                            break;
+                        }
                     }
-                    else
+                case AIType.Strongy:
                     {
-                        RunOnlyBehavior();
-                        break;
+                        if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 70)
+                        {
+                            FightFirstBehavior();
+                            //Debug.Log("스트롱기파이트퍼스트");
+                            yield return new WaitForSeconds(Random.value * 3f);
+                            break;
+                        }
+                        else if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 30)
+                        {
+                            RandomBehavior();
+                            //Debug.Log("스트롱기랜덤");
+                            yield return new WaitForSeconds(Random.value * 3f);
+                            break;
+                        }
+                        else
+                        {
+                            RunOnlyBehavior();
+                            //Debug.Log("스트롱기런온니");
+                            yield return new WaitForSeconds(Random.value * 3f);
+                            break;
+                        }
                     }
-                }
-            case AIType.Speedy:
-                {
-                    if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 100)
-                    {
-                        RunOnlyBehavior();
-                        break;
-                    }
-                    else if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 30)
-                    {
-                        RandomBehavior();
-                        break;
-                    }
-                    else
-                    {
-                        RunOnlyBehavior();
-                        break;
-                    }
-                }
-            case AIType.Strongy:
-                {
-                    if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 100)
-                    {
-                        FightFirstBehavior();
-                        break;
-                    }
-                    else if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 30)
-                    {
-                        RandomBehavior();
-                        break;
-                    }
-                    else
-                    {
-                        RunOnlyBehavior();
-                        break;
-                    }
-                }
+            }
         }
     }
 
@@ -163,10 +194,11 @@ public class AIPlayer : LivingEntity
         speed = data.speed;
         mass = data.mass;
         power = data.power;
+        type = (AIType)data.aiType;
     }
 
 
-    private void RunOnlyBehavior() 
+    private void RunOnlyBehavior()
     {
         float[] probs = { 60, 40 };
 
@@ -183,8 +215,9 @@ public class AIPlayer : LivingEntity
 
     private void RandomBehavior()
     {
-        float[] probs = { 60, 25, 15 };
-        
+        //float[] probs = { 60, 25, 15 };
+        float[] probs = { 10, 10, 80 };
+
         switch (RandomNumber(probs))
         {
             case ((int)States.Idle):
@@ -219,18 +252,24 @@ public class AIPlayer : LivingEntity
 
     private void UpdateIdle()
     {
+        State = States.Idle;
         animator.SetTrigger("Idle");
     }
 
     private void UpdateRun()
     {
+        State = States.Run;
         animator.SetTrigger("Run");
+        rb.isKinematic = true;
+        agent.destination = goalLinePos.position;
+        agent.speed = speed;
     }
 
     private void UpdateChase()
     {
         timer += Time.deltaTime;
-
+        index = Random.Range(0, targets.Count);
+        target = targets[index].transform;
         if (distanceToTarget < pushRange)
         {
             State = States.Push;
@@ -238,8 +277,11 @@ public class AIPlayer : LivingEntity
         }
         if (timer > chaseInterval)
         {
+            State = States.Chase;
             agent.SetDestination(target.position);
             timer = 0f;
+
+            Debug.Log("Chase");
         }
     }
 
@@ -258,7 +300,7 @@ public class AIPlayer : LivingEntity
         lookPos.y = transform.position.y;
         transform.LookAt(lookPos);
         animator.SetBool("Push", true);
-
+        Debug.Log("Push");
         State = States.Run;
     }
 
@@ -266,7 +308,11 @@ public class AIPlayer : LivingEntity
     {
 
         base.OnPush(strength, hitPoint, hitNormal);
+        agent.isStopped = true;
+        agent.enabled = false;
 
+        animator.SetTrigger("OnPush");
+        Debug.Log("OnPush");
     }
 
     public override void OnDie(Vector3 hitPoint, Vector3 hitNormal)
@@ -285,18 +331,13 @@ public class AIPlayer : LivingEntity
         agent.isStopped = true;
         agent.enabled = false;
 
-        animator.SetTrigger("Dei");
+        animator.SetTrigger("Die");
 
         var colliders = GetComponents<Collider>();
         foreach (var collider in colliders)
         {
             collider.enabled = false;
         }
-    }
-
-    private void UpdateDie()
-    {
-
     }
 
     public float RandomNumber(float[] probs)
@@ -322,5 +363,9 @@ public class AIPlayer : LivingEntity
             }
         }
         return probs.Length - 1;
+    }
+
+    public void SearchTarget()
+    {
     }
 }

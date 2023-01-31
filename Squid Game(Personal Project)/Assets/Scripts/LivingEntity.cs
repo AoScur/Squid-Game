@@ -18,7 +18,8 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
         Die,
     }
 
-    private Rigidbody rb;
+    [HideInInspector]
+    public Rigidbody rb;
     [HideInInspector]
     public NavMeshAgent agent;
     [HideInInspector]
@@ -33,6 +34,7 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        rb = GetComponent<Rigidbody>();
     }
 
     protected virtual void OnEnable()

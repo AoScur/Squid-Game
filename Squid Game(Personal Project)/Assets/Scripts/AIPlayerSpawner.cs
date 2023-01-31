@@ -11,12 +11,12 @@ public class AIPlayerSpawner : MonoBehaviour
     public AIData[] aiDatas;
     public Transform[] createPoints;
 
-    private List<LivingEntity> targets = new List<LivingEntity>();
+    static public List<LivingEntity> targets = new List<LivingEntity>();
 
     private void Start()
     {
         for(int i = 0; i< AIPlayerCount; i++)
-        {
+        { 
             CreateAI();
         }
     }
@@ -25,7 +25,19 @@ public class AIPlayerSpawner : MonoBehaviour
     {
         var point = createPoints[Random.Range(0, createPoints.Length)];
         var aiType = aiPrefab[Random.Range(0, aiPrefab.Length)];
-        var data = aiDatas[Random.Range(0,aiDatas.Length)];
+        AIData data = null;
+        if (aiType.name.ToCharArray().GetValue(1).Equals('e'))
+        {
+            data = aiDatas[0];
+        }
+        else if (aiType.name.ToCharArray().GetValue(1).Equals('p'))
+        {
+            data = aiDatas[1];
+        }
+        else if (aiType.name.ToCharArray().GetValue(1).Equals('t'))
+        {
+            data = aiDatas[2];
+        }
 
         var ai = Instantiate(aiType, point.position, point.rotation);
         ai.Setup(data);

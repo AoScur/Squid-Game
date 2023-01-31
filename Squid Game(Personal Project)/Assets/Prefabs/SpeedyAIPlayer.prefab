@@ -865,11 +865,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca5ec3e4da1379049952e195d69c87d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 0}
   agent: {fileID: 0}
   mass: 0
   speed: 0
   chaseSpeed: 0
   power: 0
+  pushRange: 0
+  chaseInterval: 0.25
   aiData: {fileID: 0}
 --- !u!195 &-2849278365168915604
 NavMeshAgent:
