@@ -30,7 +30,7 @@ public class AIPlayer : LivingEntity
 
     private float distanceToGoalLine;
     private float distanceToTarget;
-    public float pushRange = 2f;
+    public float pushRange = 3f;
     public float timer = 0f;
     public float chaseInterval = 2f;
     public bool run = false;
@@ -108,6 +108,11 @@ public class AIPlayer : LivingEntity
                     agent.enabled = true;
                     agent.isStopped = true;
                     agent.enabled = false;
+                    var lookPos = target.position;
+                    lookPos.y = transform.position.y;
+                    transform.LookAt(lookPos);
+                    animator.SetBool("Push", true);
+                    Debug.Log("Push");
                     break;
                 case States.Die:
                     agent.enabled = true;
@@ -311,7 +316,7 @@ public class AIPlayer : LivingEntity
     
     private void UpdateChase()
     {        
-        timer += Time.deltaTime;
+        //timer += Time.deltaTime;
 
         if (target == null)
             return;
@@ -321,33 +326,29 @@ public class AIPlayer : LivingEntity
             State = States.Push;
             return;
         }
-        if (timer > chaseInterval)
-        {
-            agent.SetDestination(target.position);
-            //animator.SetTrigger("Run");
-            timer = 0f;
-            Debug.Log("UpdateChase");
-        }
+        //if (timer > chaseInterval)
+        //{
+        //    agent.SetDestination(target.position);
+        //    //animator.SetTrigger("Run");
+        //    timer = 0f;
+        //    Debug.Log("UpdateChase");
+        //}
     }
 
     private void UpdatePush()
     {
-        timer += Time.deltaTime;
+        //timer += Time.deltaTime;
 
         if (distanceToTarget > pushRange)
         {
             State = States.Chase;
             return;
         }
-        if(timer > coolDown)
-        {
-            timer = 0f;
-            var lookPos = target.position;
-            lookPos.y = transform.position.y;
-            transform.LookAt(lookPos);
-            animator.SetBool("Push", true);
-            Debug.Log("Push");
-        }
+        //if (timer > coolDown)
+        //{
+        //    timer = 0f;
+
+        //}
     }
 
     public override void OnPush(float strength, Vector3 hitPoint, Vector3 hitNormal)

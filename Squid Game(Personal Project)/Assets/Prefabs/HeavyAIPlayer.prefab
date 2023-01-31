@@ -92,7 +92,7 @@ MonoBehaviour:
   whatIsTarget:
     serializedVersion: 2
     m_Bits: 192
-  pushRange: 2
+  pushRange: 3
   timer: 0
   chaseInterval: 0.25
   run: 0

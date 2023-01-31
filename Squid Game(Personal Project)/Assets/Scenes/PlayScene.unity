@@ -530,7 +530,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
-  m_DragThreshold: 10
+  m_DragThreshold: 3
 --- !u!4 &1509330755
 Transform:
   m_ObjectHideFlags: 0
@@ -619,7 +619,7 @@ PrefabInstance:
       objectReference: {fileID: 2362430753489953610, guid: 5189205f9541c434aaaf7c99b0de2ebc, type: 3}
     - target: {fileID: 1614892827, guid: 1204cd64b146e7c499d4d5779884d781, type: 3}
       propertyPath: AIPlayerCount
-      value: 50
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1614892827, guid: 1204cd64b146e7c499d4d5779884d781, type: 3}
       propertyPath: aiDatas.Array.size
