@@ -88,14 +88,14 @@ public class AIPlayer : LivingEntity
                     {
                         if (proximate == 0)
                         {
-                            proximate = Mathf.Abs(Vector3.Distance(transform.position, collider.transform.position));
+                            proximate = Vector3.Distance(transform.position, collider.transform.position);
                         }
-                        if (proximate >= Mathf.Abs(Vector3.Distance(transform.position, collider.transform.position)))
+                        if (proximate >= Vector3.Distance(transform.position, collider.transform.position))
                         {
                             if (this.gameObject == collider.gameObject)
                                 continue;
 
-                            proximate = Mathf.Abs(Vector3.Distance(transform.position, collider.transform.position));
+                            proximate = Vector3.Distance(transform.position, collider.transform.position);
                             target = collider.transform;
                         }
                     }
