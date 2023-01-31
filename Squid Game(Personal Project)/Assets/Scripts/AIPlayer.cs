@@ -1,13 +1,15 @@
 using Newtonsoft.Json.Bson;
-//using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
+using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEngine.GraphicsBuffer;
 
 
 public class AIPlayer : LivingEntity
@@ -19,10 +21,7 @@ public class AIPlayer : LivingEntity
         Speedy,
         Strongy,
     }
-
-
-
-    private List<GameObject> Alives = new List<GameObject>();
+    public LayerMask whatIsTarget;
     private Transform target;
 
     private Transform goalLinePos;
@@ -31,11 +30,12 @@ public class AIPlayer : LivingEntity
 
     private float distanceToGoalLine;
     private float distanceToTarget;
-    public float pushRange;
-    private float timer = 0f;
+    public float pushRange = 2f;
+    public float timer = 0f;
     public float chaseInterval = 0.25f;
-    private bool run = false;
-    private int index = 0;
+    public bool run = false;
+    public float proximate = 0f;
+    public float coolDown = 0.25f;
 
     private List<LivingEntity> targets;
 
@@ -63,23 +63,56 @@ public class AIPlayer : LivingEntity
             {
                 case States.Idle:
                     timer = 0f;
+                    agent.enabled = true;
                     agent.isStopped = true;
+                    agent.enabled = false;
+                    animator.SetTrigger("Idle");
+                    //Debug.Log("Idle");
                     break;
                 case States.Run:
-                    agent.speed = speed;
+                    agent.enabled = true;
                     agent.isStopped = false;
-                    agent.SetDestination(runDestination);
+                    rb.isKinematic = true;
+                    agent.SetDestination(goalLinePos.position);
+                    agent.speed = speed;
+                    animator.SetTrigger("Run");
+                    //Debug.Log("Run");
                     break;
                 case States.Chase:
                     timer = 0f;
-                    agent.speed = chaseSpeed;
+                    agent.enabled = true;
                     agent.isStopped = false;
+
+                    var colliders = Physics.OverlapSphere(transform.position, 10f, whatIsTarget);
+                    foreach (var collider in colliders)
+                    {
+                        if (proximate == 0)
+                        {
+                            proximate = Mathf.Abs(Vector3.Distance(transform.position, collider.transform.position));
+                        }
+                        if (proximate >= Mathf.Abs(Vector3.Distance(transform.position, collider.transform.position)))
+                        {
+                            if (this.gameObject == collider.gameObject)
+                                continue;
+
+                            proximate = Mathf.Abs(Vector3.Distance(transform.position, collider.transform.position));
+                            target = collider.transform;
+                        }
+                    }
+                    if (target == null)
+                        return;
+                    agent.SetDestination(target.position);
+                    agent.speed = chaseSpeed;
                     break;
                 case States.Push:
+                    agent.enabled = true;
                     agent.isStopped = true;
+                    agent.enabled = false;
                     break;
                 case States.Die:
+                    agent.enabled = true;
                     agent.isStopped = true;
+                    agent.enabled = false;
                     break;
             }
         }
@@ -102,14 +135,38 @@ public class AIPlayer : LivingEntity
         StartCoroutine(StateChange());
     }
 
+    //private void OnDrawGizmos()
+    //{
+    //    if (!Application.isPlaying)
+    //        return;
+    //    Gizmos.color = Color.red;
+    //    Gizmos.DrawWireSphere(transform.position, 10f);
+    //}
+
     private void Update()
     {
+        if(target!=null)
+        {
+            if (State != States.Die)
+            {
+                distanceToTarget = Vector3.Distance(transform.position, target.position);
+            }
 
+            switch (State)
+            {
+                case States.Chase:
+                    UpdateChase();
+                    break;
+                case States.Push:
+                    UpdatePush();
+                    break;
+            }
+        }
     }
 
     private IEnumerator StateChange()
     {
-        while (true)
+        while (!dead)
         {
             switch (type)
             {
@@ -195,6 +252,7 @@ public class AIPlayer : LivingEntity
         mass = data.mass;
         power = data.power;
         type = (AIType)data.aiType;
+        chaseSpeed = data.speed * 1.5f;
     }
 
 
@@ -205,29 +263,28 @@ public class AIPlayer : LivingEntity
         switch (RandomNumber(probs))
         {
             case ((int)States.Idle):
-                UpdateIdle();
+                State = States.Idle;
                 break;
             case ((int)States.Run):
-                UpdateRun();
+                State = States.Run;
                 break;
         }
     }
 
     private void RandomBehavior()
     {
-        //float[] probs = { 60, 25, 15 };
-        float[] probs = { 10, 10, 80 };
-
+        float[] probs = { 60, 25, 15 };
+        
         switch (RandomNumber(probs))
         {
             case ((int)States.Idle):
-                UpdateIdle();
+                State = States.Idle;
                 break;
             case ((int)States.Run):
-                UpdateRun();
+                State = States.Run;
                 break;
             case ((int)States.Chase):
-                UpdateChase();
+                State = States.Chase;
                 break;
         }
     }
@@ -239,37 +296,24 @@ public class AIPlayer : LivingEntity
         switch (RandomNumber(probs))
         {
             case ((int)States.Idle):
-                UpdateIdle();
+                State = States.Idle;
                 break;
             case ((int)States.Run):
-                UpdateRun();
+                State = States.Run;
                 break;
             case ((int)States.Chase):
-                UpdateChase();
+                State = States.Chase;
                 break;
         }
     }
-
-    private void UpdateIdle()
-    {
-        State = States.Idle;
-        animator.SetTrigger("Idle");
-    }
-
-    private void UpdateRun()
-    {
-        State = States.Run;
-        animator.SetTrigger("Run");
-        rb.isKinematic = true;
-        agent.destination = goalLinePos.position;
-        agent.speed = speed;
-    }
-
+    
     private void UpdateChase()
-    {
+    {        
         timer += Time.deltaTime;
-        index = Random.Range(0, targets.Count);
-        target = targets[index].transform;
+
+        if (target == null)
+            return;
+
         if (distanceToTarget < pushRange)
         {
             State = States.Push;
@@ -277,11 +321,9 @@ public class AIPlayer : LivingEntity
         }
         if (timer > chaseInterval)
         {
-            State = States.Chase;
             agent.SetDestination(target.position);
+            animator.SetTrigger("Run");
             timer = 0f;
-
-            Debug.Log("Chase");
         }
     }
 
@@ -294,22 +336,20 @@ public class AIPlayer : LivingEntity
             State = States.Chase;
             return;
         }
-
-        timer = 0f;
-        var lookPos = target.position;
-        lookPos.y = transform.position.y;
-        transform.LookAt(lookPos);
-        animator.SetBool("Push", true);
-        Debug.Log("Push");
-        State = States.Run;
+        if(timer > coolDown)
+        {
+            timer = 0f;
+            var lookPos = target.position;
+            lookPos.y = transform.position.y;
+            transform.LookAt(lookPos);
+            animator.SetBool("Push", true);
+            Debug.Log("Push");
+        }
     }
 
     public override void OnPush(float strength, Vector3 hitPoint, Vector3 hitNormal)
     {
-
         base.OnPush(strength, hitPoint, hitNormal);
-        agent.isStopped = true;
-        agent.enabled = false;
 
         animator.SetTrigger("OnPush");
         Debug.Log("OnPush");
@@ -328,8 +368,6 @@ public class AIPlayer : LivingEntity
 
         //zomAudioPlayer.PlayOneShot(hurtClip);
         base.OnDie(hitPoint, hitNormal);
-        agent.isStopped = true;
-        agent.enabled = false;
 
         animator.SetTrigger("Die");
 

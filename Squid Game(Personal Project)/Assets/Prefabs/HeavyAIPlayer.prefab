@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2362430753489953610}
   - component: {fileID: 178835934951267788}
   - component: {fileID: 607344974660902277}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: HeavyAIPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,8 +89,15 @@ MonoBehaviour:
   speed: 0
   chaseSpeed: 0
   power: 0
-  pushRange: 0
+  whatIsTarget:
+    serializedVersion: 2
+    m_Bits: 192
+  pushRange: 2
+  timer: 0
   chaseInterval: 0.25
+  run: 0
+  index: 0
+  proximate: 0
   aiData: {fileID: 0}
 --- !u!195 &178835934951267788
 NavMeshAgent:

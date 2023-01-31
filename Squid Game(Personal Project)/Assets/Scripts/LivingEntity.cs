@@ -28,12 +28,8 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
     public bool dead { get; protected set; }
     public event Action onDeath;
 
-    private List<LivingEntity> targets = new List<LivingEntity>();
-
-
     private void Awake()
     {
-        agent = GetComponent<NavMeshAgent>();
         rb = GetComponent<Rigidbody>();
     }
 
