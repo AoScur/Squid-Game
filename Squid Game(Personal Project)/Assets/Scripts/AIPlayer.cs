@@ -32,7 +32,7 @@ public class AIPlayer : LivingEntity
     private float distanceToTarget;
     public float pushRange = 2f;
     public float timer = 0f;
-    public float chaseInterval = 0.25f;
+    public float chaseInterval = 2f;
     public bool run = false;
     public float proximate = 0f;
     public float coolDown = 0.25f;
@@ -66,7 +66,7 @@ public class AIPlayer : LivingEntity
                     agent.enabled = true;
                     agent.isStopped = true;
                     agent.enabled = false;
-                    animator.SetTrigger("Idle");
+                    //animator.SetTrigger("Idle");
                     //Debug.Log("Idle");
                     break;
                 case States.Run:
@@ -75,7 +75,7 @@ public class AIPlayer : LivingEntity
                     rb.isKinematic = true;
                     agent.SetDestination(goalLinePos.position);
                     agent.speed = speed;
-                    animator.SetTrigger("Run");
+                    //animator.SetTrigger("Run");
                     //Debug.Log("Run");
                     break;
                 case States.Chase:
@@ -162,6 +162,8 @@ public class AIPlayer : LivingEntity
                     break;
             }
         }
+
+        animator.SetFloat("Speed", agent.velocity.magnitude);
     }
 
     private IEnumerator StateChange()
@@ -322,8 +324,9 @@ public class AIPlayer : LivingEntity
         if (timer > chaseInterval)
         {
             agent.SetDestination(target.position);
-            animator.SetTrigger("Run");
+            //animator.SetTrigger("Run");
             timer = 0f;
+            Debug.Log("UpdateChase");
         }
     }
 
