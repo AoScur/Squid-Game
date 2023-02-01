@@ -66,6 +66,8 @@ public class AIPlayer : LivingEntity
                     agent.enabled = true;
                     agent.isStopped = true;
                     agent.enabled = false;
+                    animator.SetBool("Push", false);
+
                     //animator.SetTrigger("Idle");
                     //Debug.Log("Idle");
                     break;
@@ -75,6 +77,8 @@ public class AIPlayer : LivingEntity
                     rb.isKinematic = true;
                     agent.SetDestination(runDestination);
                     agent.speed = speed;
+                    animator.SetBool("Push", false);
+
                     //animator.SetTrigger("Run");
                     //Debug.Log("Run");
                     break;
@@ -82,6 +86,7 @@ public class AIPlayer : LivingEntity
                     timer = 0f;
                     agent.enabled = true;
                     agent.isStopped = false;
+                    animator.SetBool("Push", false);
 
                     var colliders = Physics.OverlapSphere(transform.position, 10f, whatIsTarget);
                     foreach (var collider in colliders)
@@ -100,7 +105,10 @@ public class AIPlayer : LivingEntity
                         }
                     }
                     if (target == null)
+                    {
+                        State = States.Run;
                         return;
+                    }
                     agent.SetDestination(target.position);
                     agent.speed = chaseSpeed;
                     break;
@@ -112,9 +120,10 @@ public class AIPlayer : LivingEntity
                     lookPos.y = transform.position.y;
                     transform.LookAt(lookPos);
                     animator.SetBool("Push", true);
-                    Debug.Log("Push");
+                    //Debug.Log("Push");
                     break;
                 case States.Die:
+                    animator.SetBool("Push", false);
                     agent.enabled = true;
                     agent.isStopped = true;
                     agent.enabled = false;
@@ -156,16 +165,16 @@ public class AIPlayer : LivingEntity
             {
                 distanceToTarget = Vector3.Distance(transform.position, target.position);
             }
+        }
 
-            switch (State)
-            {
-                case States.Chase:
-                    UpdateChase();
-                    break;
-                case States.Push:
-                    UpdatePush();
-                    break;
-            }
+        switch (State)
+        {
+            case States.Chase:
+                UpdateChase();
+                break;
+            case States.Push:
+                UpdatePush();
+                break;
         }
 
         animator.SetFloat("Speed", agent.velocity.magnitude);
@@ -316,47 +325,48 @@ public class AIPlayer : LivingEntity
 
     private void UpdateChase()
     {
-        //timer += Time.deltaTime;
+        timer += Time.deltaTime;
 
         if (target == null)
+        {
+            State = States.Run;
             return;
+        }
 
-        if (distanceToTarget < pushRange && State != States.Push)
+        if (distanceToTarget < pushRange )
         {
             State = States.Push;
             return;
         }
-        //if (timer > chaseInterval)
-        //{
-        //    agent.SetDestination(target.position);
-        //    //animator.SetTrigger("Run");
-        //    timer = 0f;
-        //    Debug.Log("UpdateChase");
-        //}
+        if (timer > chaseInterval)
+        {
+            agent.SetDestination(target.position);
+            timer = 0f;
+        }
     }
 
     private void UpdatePush()
     {
-        //timer += Time.deltaTime;
+        timer += Time.deltaTime;
 
-        if (distanceToTarget > pushRange && State != States.Chase)
+        if (distanceToTarget > pushRange)
         {
             State = States.Chase;
             return;
-            Debug.Log("Chase");
         }
-        //if (timer > coolDown)
-        //{
-        //    timer = 0f;
-
-        //}
     }
 
     public override void OnPush(float strength, Vector3 hitPoint, Vector3 hitNormal)
     {
-        base.OnPush(strength, hitPoint, hitNormal);
+        if (dead)
+        {
+            return;
+        }
 
+        agent.isStopped = true;
+        agent.enabled = false;
         animator.SetTrigger("OnPush");
+        base.OnPush(strength, hitPoint, hitNormal);
         Debug.Log("OnPush");
     }
 

@@ -14,7 +14,7 @@ public class AIPlayerSpawner : MonoBehaviour
     static public List<LivingEntity> targets = new List<LivingEntity>();
 
     private void Start()
-    {
+    { 
         for(int i = 0; i< AIPlayerCount; i++)
         { 
             CreateAI();
