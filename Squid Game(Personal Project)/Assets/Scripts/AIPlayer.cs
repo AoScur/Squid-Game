@@ -73,7 +73,7 @@ public class AIPlayer : LivingEntity
                     agent.enabled = true;
                     agent.isStopped = false;
                     rb.isKinematic = true;
-                    agent.SetDestination(goalLinePos.position);
+                    agent.SetDestination(runDestination);
                     agent.speed = speed;
                     //animator.SetTrigger("Run");
                     //Debug.Log("Run");
@@ -150,7 +150,7 @@ public class AIPlayer : LivingEntity
 
     private void Update()
     {
-        if(target!=null)
+        if (target != null)
         {
             if (State != States.Die)
             {
@@ -281,7 +281,7 @@ public class AIPlayer : LivingEntity
     private void RandomBehavior()
     {
         float[] probs = { 60, 25, 15 };
-        
+
         switch (RandomNumber(probs))
         {
             case ((int)States.Idle):
@@ -313,15 +313,15 @@ public class AIPlayer : LivingEntity
                 break;
         }
     }
-    
+
     private void UpdateChase()
-    {        
+    {
         //timer += Time.deltaTime;
 
         if (target == null)
             return;
 
-        if (distanceToTarget < pushRange)
+        if (distanceToTarget < pushRange && State != States.Push)
         {
             State = States.Push;
             return;
@@ -339,10 +339,11 @@ public class AIPlayer : LivingEntity
     {
         //timer += Time.deltaTime;
 
-        if (distanceToTarget > pushRange)
+        if (distanceToTarget > pushRange && State != States.Chase)
         {
             State = States.Chase;
             return;
+            Debug.Log("Chase");
         }
         //if (timer > coolDown)
         //{
