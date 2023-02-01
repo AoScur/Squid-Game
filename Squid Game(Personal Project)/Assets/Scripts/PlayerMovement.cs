@@ -6,6 +6,7 @@ using UnityEngine.AI;
 public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed = 5f;
+    public GameObject GO;
 
     private PlayerInput playerInput;
     private Rigidbody playerRigidbody;

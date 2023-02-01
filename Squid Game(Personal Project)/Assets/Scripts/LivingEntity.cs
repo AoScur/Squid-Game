@@ -38,9 +38,12 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
         dead = false;        
     }
 
-    public virtual void OnPush(float strength, Vector3 hitPoint, Vector3 hitNormal)
+    public virtual void OnPush(Vector3 hitPoint, Vector3 hitNormal)
     {
-        Vector3 force = (hitNormal - hitPoint) * strength;
+        Vector3 force = (hitNormal - hitPoint) * 5f;
+        agent.enabled = false;
+        rb.isKinematic = false;
+        rb.detectCollisions = true;
         rb.AddForce(force);
     }
 

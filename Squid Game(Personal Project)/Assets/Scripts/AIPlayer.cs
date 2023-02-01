@@ -22,7 +22,7 @@ public class AIPlayer : LivingEntity
         Strongy,
     }
     public LayerMask whatIsTarget;
-    private Transform target;
+    private LivingEntity target;
 
     private Transform goalLinePos;
 
@@ -63,30 +63,36 @@ public class AIPlayer : LivingEntity
             {
                 case States.Idle:
                     timer = 0f;
+                    rb.isKinematic = true;
                     agent.enabled = true;
                     agent.isStopped = true;
                     agent.enabled = false;
                     animator.SetBool("Push", false);
+                    animator.SetBool("OnPush", false);
 
                     //animator.SetTrigger("Idle");
                     //Debug.Log("Idle");
                     break;
                 case States.Run:
+                    rb.isKinematic = true;
                     agent.enabled = true;
                     agent.isStopped = false;
                     rb.isKinematic = true;
                     agent.SetDestination(runDestination);
                     agent.speed = speed;
                     animator.SetBool("Push", false);
+                    animator.SetBool("OnPush", false);
 
                     //animator.SetTrigger("Run");
                     //Debug.Log("Run");
                     break;
                 case States.Chase:
                     timer = 0f;
+                    rb.isKinematic = true;
                     agent.enabled = true;
                     agent.isStopped = false;
                     animator.SetBool("Push", false);
+                    animator.SetBool("OnPush", false);
 
                     var colliders = Physics.OverlapSphere(transform.position, 10f, whatIsTarget);
                     foreach (var collider in colliders)
@@ -101,7 +107,7 @@ public class AIPlayer : LivingEntity
                                 continue;
 
                             proximate = Vector3.Distance(transform.position, collider.transform.position);
-                            target = collider.transform;
+                            target = collider.gameObject.GetComponent<LivingEntity>();
                         }
                     }
                     if (target == null)
@@ -109,21 +115,22 @@ public class AIPlayer : LivingEntity
                         State = States.Run;
                         return;
                     }
-                    agent.SetDestination(target.position);
+                    agent.SetDestination(target.transform.position);
                     agent.speed = chaseSpeed;
                     break;
                 case States.Push:
+                    rb.isKinematic = true;
                     agent.enabled = true;
                     agent.isStopped = true;
                     agent.enabled = false;
-                    var lookPos = target.position;
-                    lookPos.y = transform.position.y;
-                    transform.LookAt(lookPos);
-                    animator.SetBool("Push", true);
+                    animator.SetBool("OnPush", false);
+
                     //Debug.Log("Push");
                     break;
                 case States.Die:
+                    rb.isKinematic = true;
                     animator.SetBool("Push", false);
+                    animator.SetBool("OnPush", false);
                     agent.enabled = true;
                     agent.isStopped = true;
                     agent.enabled = false;
@@ -138,6 +145,7 @@ public class AIPlayer : LivingEntity
         goalLinePos = GameObject.FindWithTag("GoalLine").GetComponent<Transform>();
         agent = GetComponent<NavMeshAgent>();
         rb = GetComponent<Rigidbody>();
+        target = GetComponent<LivingEntity>();
         targets = AIPlayerSpawner.targets;
         //Debug.Log(aiData.name);
     }
@@ -163,7 +171,7 @@ public class AIPlayer : LivingEntity
         {
             if (State != States.Die)
             {
-                distanceToTarget = Vector3.Distance(transform.position, target.position);
+                distanceToTarget = Vector3.Distance(transform.position, target.transform.position);
             }
         }
 
@@ -340,7 +348,7 @@ public class AIPlayer : LivingEntity
         }
         if (timer > chaseInterval)
         {
-            agent.SetDestination(target.position);
+            agent.SetDestination(target.transform.position);
             timer = 0f;
         }
     }
@@ -356,17 +364,39 @@ public class AIPlayer : LivingEntity
         }
     }
 
-    public override void OnPush(float strength, Vector3 hitPoint, Vector3 hitNormal)
+    private void OnCollisionStay(Collision other)
+    {
+        Debug.Log("Push");
+        var pushTarget = other.collider.GetComponent<LivingEntity>();
+        if (dead || target == null || pushTarget != target)
+        {
+            return;
+        }
+
+        var lookPos = target.transform.position;
+        lookPos.y = transform.position.y;
+        transform.LookAt(lookPos);
+
+        animator.SetBool("Push", true);
+
+        var hitPoint = other.collider.ClosestPoint(transform.position);
+        var hitNormal = (transform.position - other.transform.position).normalized;
+
+        target.OnPush(hitPoint, hitNormal);
+        Debug.Log("Push");
+    }
+
+    public override void OnPush(Vector3 hitPoint, Vector3 hitNormal)
     {
         if (dead)
         {
             return;
         }
-
+        agent.enabled = true;
         agent.isStopped = true;
         agent.enabled = false;
-        animator.SetTrigger("OnPush");
-        base.OnPush(strength, hitPoint, hitNormal);
+        animator.SetBool("OnPush", true);
+        base.OnPush(hitPoint, hitNormal);
         Debug.Log("OnPush");
     }
 
@@ -416,9 +446,5 @@ public class AIPlayer : LivingEntity
             }
         }
         return probs.Length - 1;
-    }
-
-    public void SearchTarget()
-    {
     }
 }

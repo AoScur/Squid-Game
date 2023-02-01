@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IPushable
 {
-    void OnPush(float strength, Vector3 hitPoint, Vector3 hitNormal);
+    void OnPush(Vector3 hitPoint, Vector3 hitNormal);
 }
