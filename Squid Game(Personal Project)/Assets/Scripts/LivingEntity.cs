@@ -14,7 +14,7 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
         Run,
         Chase,
         Push,
-        FallDown,
+        OnPush,
         Die,
     }
 
@@ -40,7 +40,7 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
 
     public virtual void OnPush(Vector3 hitPoint, Vector3 hitNormal)
     {
-        Vector3 force = (hitNormal - hitPoint) * 5f;
+        Vector3 force = hitNormal * 5f;
         agent.enabled = false;
         rb.isKinematic = false;
         rb.detectCollisions = true;

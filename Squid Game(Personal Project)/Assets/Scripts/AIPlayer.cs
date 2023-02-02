@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Bson;
+using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -30,12 +31,14 @@ public class AIPlayer : LivingEntity
 
     private float distanceToGoalLine;
     private float distanceToTarget;
-    public float pushRange = 3f;
+    public float pushRange = 1f;
     public float timer = 0f;
     public float chaseInterval = 2f;
     public bool run = false;
     public float proximate = 0f;
     public float coolDown = 0.25f;
+
+    bool skip = false;
 
     private List<LivingEntity> targets;
 
@@ -59,6 +62,7 @@ public class AIPlayer : LivingEntity
             if (prevState == state)
                 return;
 
+     
             switch (state)
             {
                 case States.Idle:
@@ -68,10 +72,6 @@ public class AIPlayer : LivingEntity
                     agent.isStopped = true;
                     agent.enabled = false;
                     animator.SetBool("Push", false);
-                    animator.SetBool("OnPush", false);
-
-                    //animator.SetTrigger("Idle");
-                    //Debug.Log("Idle");
                     break;
                 case States.Run:
                     rb.isKinematic = true;
@@ -81,10 +81,6 @@ public class AIPlayer : LivingEntity
                     agent.SetDestination(runDestination);
                     agent.speed = speed;
                     animator.SetBool("Push", false);
-                    animator.SetBool("OnPush", false);
-
-                    //animator.SetTrigger("Run");
-                    //Debug.Log("Run");
                     break;
                 case States.Chase:
                     timer = 0f;
@@ -92,7 +88,6 @@ public class AIPlayer : LivingEntity
                     agent.enabled = true;
                     agent.isStopped = false;
                     animator.SetBool("Push", false);
-                    animator.SetBool("OnPush", false);
 
                     var colliders = Physics.OverlapSphere(transform.position, 10f, whatIsTarget);
                     foreach (var collider in colliders)
@@ -119,18 +114,29 @@ public class AIPlayer : LivingEntity
                     agent.speed = chaseSpeed;
                     break;
                 case States.Push:
+                    skip = true;
                     rb.isKinematic = true;
                     agent.enabled = true;
                     agent.isStopped = true;
                     agent.enabled = false;
-                    animator.SetBool("OnPush", false);
 
-                    //Debug.Log("Push");
+                    var lookPos = target.transform.position;
+                    lookPos.y = transform.position.y;
+                    transform.LookAt(lookPos);
+
+                    animator.SetBool("Push", true);
+                    break;
+                case States.OnPush:
+                    skip = true;
+                    agent.enabled = true;
+                    agent.isStopped = true;
+                    agent.enabled = false;
+                    rb.isKinematic = false;
+                    animator.SetBool("Push", false);
                     break;
                 case States.Die:
                     rb.isKinematic = true;
                     animator.SetBool("Push", false);
-                    animator.SetBool("OnPush", false);
                     agent.enabled = true;
                     agent.isStopped = true;
                     agent.enabled = false;
@@ -145,9 +151,8 @@ public class AIPlayer : LivingEntity
         goalLinePos = GameObject.FindWithTag("GoalLine").GetComponent<Transform>();
         agent = GetComponent<NavMeshAgent>();
         rb = GetComponent<Rigidbody>();
-        target = GetComponent<LivingEntity>();
+
         targets = AIPlayerSpawner.targets;
-        //Debug.Log(aiData.name);
     }
 
     private void Start()
@@ -167,6 +172,11 @@ public class AIPlayer : LivingEntity
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            OnPush(transform.position, Vector3.up);
+        }
+
         if (target != null)
         {
             if (State != States.Die)
@@ -183,15 +193,72 @@ public class AIPlayer : LivingEntity
             case States.Push:
                 UpdatePush();
                 break;
+            case States.OnPush:
+                UpdateOnPush();
+                break;
         }
 
         animator.SetFloat("Speed", agent.velocity.magnitude);
+    }
+
+    private void UpdateChase()
+    {
+        timer += Time.deltaTime;
+
+        if (target == null)
+        {
+            State = States.Run;
+            return;
+        }
+
+        if (distanceToTarget < pushRange)
+        {
+            State = States.Push;
+            return;
+        }
+        if (timer > chaseInterval)
+        {
+            agent.SetDestination(target.transform.position);
+            timer = 0f;
+        }
+    }
+
+
+    private void UpdatePush()
+    {
+        if (animator.GetBool("Push"))
+        {
+            var info = animator.GetCurrentAnimatorStateInfo(0);
+            if (info.IsName("Push") && info.normalizedTime >= 1f)
+            {
+                animator.SetBool("Push", false);
+                skip = false;
+            }
+        }
+    }
+
+    private void UpdateOnPush()
+    {
+        if (animator.GetBool("OnPush"))
+        {
+            var info = animator.GetCurrentAnimatorStateInfo(0);
+            if (info.IsName("OnPush") && info.normalizedTime >= 1f)
+            {
+                animator.SetBool("OnPush", false);
+                skip = false;
+            }
+        }
     }
 
     private IEnumerator StateChange()
     {
         while (!dead)
         {
+            if (skip)
+            {
+                yield return null;
+                continue;
+            }
             switch (type)
             {
                 case AIType.Heavy:
@@ -199,21 +266,18 @@ public class AIPlayer : LivingEntity
                         if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 70)
                         {
                             RandomBehavior();
-                            //Debug.Log("해비랜덤1");
                             yield return new WaitForSeconds(Random.value * 3f);
                             break;
                         }
                         else if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 30)
                         {
                             RandomBehavior();
-                            //Debug.Log("해비랜덤2");
                             yield return new WaitForSeconds(Random.value * 3f);
                             break;
                         }
                         else
                         {
                             RunOnlyBehavior();
-                            //Debug.Log("해비런온니");
                             yield return new WaitForSeconds(Random.value * 3f);
                             break;
                         }
@@ -223,21 +287,18 @@ public class AIPlayer : LivingEntity
                         if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 70)
                         {
                             RunOnlyBehavior();
-                            //Debug.Log("스피디런온니1");
                             yield return new WaitForSeconds(Random.value * 3f);
                             break;
                         }
                         else if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 30)
                         {
                             RandomBehavior();
-                            //Debug.Log("스피디랜덤");
                             yield return new WaitForSeconds(Random.value * 3f);
                             break;
                         }
                         else
                         {
                             RunOnlyBehavior();
-                            //Debug.Log("스피디런온니2");
                             yield return new WaitForSeconds(Random.value * 3f);
                             break;
                         }
@@ -247,21 +308,18 @@ public class AIPlayer : LivingEntity
                         if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 70)
                         {
                             FightFirstBehavior();
-                            //Debug.Log("스트롱기파이트퍼스트");
                             yield return new WaitForSeconds(Random.value * 3f);
                             break;
                         }
                         else if (Mathf.Abs(goalLinePos.position.z - transform.position.z) > 30)
                         {
                             RandomBehavior();
-                            //Debug.Log("스트롱기랜덤");
                             yield return new WaitForSeconds(Random.value * 3f);
                             break;
                         }
                         else
                         {
                             RunOnlyBehavior();
-                            //Debug.Log("스트롱기런온니");
                             yield return new WaitForSeconds(Random.value * 3f);
                             break;
                         }
@@ -331,59 +389,14 @@ public class AIPlayer : LivingEntity
         }
     }
 
-    private void UpdateChase()
+    
+
+    public void Kick()
     {
-        timer += Time.deltaTime;
-
-        if (target == null)
-        {
-            State = States.Run;
-            return;
-        }
-
-        if (distanceToTarget < pushRange )
-        {
-            State = States.Push;
-            return;
-        }
-        if (timer > chaseInterval)
-        {
-            agent.SetDestination(target.transform.position);
-            timer = 0f;
-        }
-    }
-
-    private void UpdatePush()
-    {
-        timer += Time.deltaTime;
-
-        if (distanceToTarget > pushRange)
-        {
-            State = States.Chase;
-            return;
-        }
-    }
-
-    private void OnCollisionStay(Collision other)
-    {
-        Debug.Log("Push");
-        var pushTarget = other.collider.GetComponent<LivingEntity>();
-        if (dead || target == null || pushTarget != target)
-        {
-            return;
-        }
-
-        var lookPos = target.transform.position;
-        lookPos.y = transform.position.y;
-        transform.LookAt(lookPos);
-
-        animator.SetBool("Push", true);
-
-        var hitPoint = other.collider.ClosestPoint(transform.position);
-        var hitNormal = (transform.position - other.transform.position).normalized;
+        var hitPoint = target.GetComponent<CapsuleCollider>().ClosestPoint(transform.position); 
+        var hitNormal = (transform.position - target.transform.position).normalized;
 
         target.OnPush(hitPoint, hitNormal);
-        Debug.Log("Push");
     }
 
     public override void OnPush(Vector3 hitPoint, Vector3 hitNormal)
@@ -392,12 +405,9 @@ public class AIPlayer : LivingEntity
         {
             return;
         }
-        agent.enabled = true;
-        agent.isStopped = true;
-        agent.enabled = false;
+        State = States.OnPush;
         animator.SetBool("OnPush", true);
         base.OnPush(hitPoint, hitNormal);
-        Debug.Log("OnPush");
     }
 
     public override void OnDie(Vector3 hitPoint, Vector3 hitNormal)
