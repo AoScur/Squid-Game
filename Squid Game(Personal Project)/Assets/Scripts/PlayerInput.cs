@@ -16,7 +16,7 @@ public class PlayerInput : MonoBehaviour
     {
         moveV = Input.GetAxis(moveVAxisName);
         moveH = Input.GetAxis(moveHAxisName);
-        push = Input.GetButton(PushButtonName);
+        push = Input.GetButtonDown(PushButtonName);
 
         mousePos = Input.mousePosition;
     }

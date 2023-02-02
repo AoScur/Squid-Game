@@ -716,13 +716,12 @@ GameObject:
   - component: {fileID: 4776999971981130694}
   - component: {fileID: 4830366902704160608}
   - component: {fileID: 4781618680556681670}
-  - component: {fileID: 4781618680556681666}
   - component: {fileID: 4781618680556681667}
   - component: {fileID: 5682535830362247866}
-  - component: {fileID: 996567797721060584}
-  m_Layer: 0
+  - component: {fileID: 8321927898702375514}
+  m_Layer: 6
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -772,27 +771,13 @@ Rigidbody:
   m_GameObject: {fileID: 4782755024984964252}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_Drag: Infinity
+  m_AngularDrag: Infinity
   m_UseGravity: 0
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 84
+  m_Constraints: 116
   m_CollisionDetection: 0
---- !u!114 &4781618680556681666
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4782755024984964252}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d1321cfacee91a40a6728db96ea4ba9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 5
-  GO: {fileID: 0}
 --- !u!114 &4781618680556681667
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -822,28 +807,25 @@ CapsuleCollider:
   m_Height: 1.9365039
   m_Direction: 1
   m_Center: {x: 0.013878301, y: 0.9082606, z: 0}
---- !u!195 &996567797721060584
-NavMeshAgent:
+--- !u!114 &8321927898702375514
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4782755024984964252}
   m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 743ca982491c6fa4dac2be730efaf0f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 0}
+  agent: {fileID: 0}
+  mass: 0
+  speed: 0
+  chaseSpeed: 0
+  power: 0
+  coolDown: 0.25
 --- !u!1 &4942645778654439306
 GameObject:
   m_ObjectHideFlags: 0

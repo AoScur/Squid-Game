@@ -11,7 +11,7 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
-        cameraSpeed = player.GetComponent<PlayerMovement>().moveSpeed;
+        cameraSpeed = player.GetComponent<Player>().speed;
         cameraOffset = transform.position;
     }
 
