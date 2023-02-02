@@ -59,6 +59,7 @@ public class Player : LivingEntity
 
     private void Start()
     {
+        GameManager.targets.Add(this);
         State = States.Idle;
     }
 

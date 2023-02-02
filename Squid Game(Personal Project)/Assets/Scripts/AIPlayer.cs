@@ -40,8 +40,6 @@ public class AIPlayer : LivingEntity
 
     bool skip = false;
 
-    private List<LivingEntity> targets;
-
     [HideInInspector]
     public AIData aiData;
     public AIType type { get; private set; } // 현재 AI 종류
@@ -151,8 +149,6 @@ public class AIPlayer : LivingEntity
         goalLinePos = GameObject.FindWithTag("GoalLine").GetComponent<Transform>();
         agent = GetComponent<NavMeshAgent>();
         rb = GetComponent<Rigidbody>();
-
-        targets = AIPlayerSpawner.targets;
     }
 
     private void Start()
@@ -172,11 +168,6 @@ public class AIPlayer : LivingEntity
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            OnPush(transform.position, Vector3.up);
-        }
-
         if (target != null)
         {
             if (State != States.Die)
@@ -387,9 +378,7 @@ public class AIPlayer : LivingEntity
                 State = States.Chase;
                 break;
         }
-    }
-
-    
+    }    
 
     public void Kick()
     {
@@ -426,11 +415,11 @@ public class AIPlayer : LivingEntity
 
         animator.SetTrigger("Die");
 
-        var colliders = GetComponents<Collider>();
-        foreach (var collider in colliders)
-        {
-            collider.enabled = false;
-        }
+        //var colliders = GetComponents<Collider>();
+        //foreach (var collider in colliders)
+        //{
+        //    collider.enabled = false;
+        //}
     }
 
     public float RandomNumber(float[] probs)

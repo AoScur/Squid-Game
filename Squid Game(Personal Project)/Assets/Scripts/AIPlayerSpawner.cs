@@ -12,11 +12,10 @@ public class AIPlayerSpawner : MonoBehaviour
 
     public AIData[] aiDatas;
 
-    static public List<LivingEntity> targets = new List<LivingEntity>();
-
     private void Awake()
     {
         rangeCollider = GetComponent<BoxCollider>();
+
     }
     private void Start()
     { 
@@ -35,7 +34,8 @@ public class AIPlayerSpawner : MonoBehaviour
         range_Z = Random.Range((range_Z / 2) * -1, range_Z / 2);
         Vector3 randomPostion = new Vector3(range_X, 0f, range_Z);
         NavMeshHit hit;
-        if(NavMesh.SamplePosition(randomPostion,out hit, 3.0f, NavMesh.AllAreas))
+
+        if (NavMesh.SamplePosition(randomPostion,out hit, 10f, NavMesh.AllAreas))
         {
             result = hit.position;
             return true;
@@ -67,10 +67,8 @@ public class AIPlayerSpawner : MonoBehaviour
         {
             var ai = Instantiate(aiType, point, transform.rotation);
             ai.Setup(data);
-            targets.Add(ai);
-
-            ai.onDeath += () => targets.Remove(ai);
+            GameManager.targets.Add(ai);
+            ai.onDeath += () => GameManager.targets.Remove(ai);
         }
-
     }
 }
