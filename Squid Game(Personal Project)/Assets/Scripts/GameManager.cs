@@ -21,6 +21,10 @@ public class GameManager : MonoBehaviour
 
     public static List<LivingEntity> targets = new List<LivingEntity>();
 
+    private Tagger tagger;
+
+    public bool isStop { get; private set; }
+
     public bool isGameover { get; private set; }
 
     private void Awake()
@@ -36,11 +40,21 @@ public class GameManager : MonoBehaviour
         var find = GameObject.FindWithTag("Player");
         var player = find.GetComponent<Player>();
         player.onDeath += EndGame;
+        isStop = false;
+        tagger = GameObject.FindWithTag("Tagger").GetComponent<Tagger>();
+        StartCoroutine(GoAndStop());
     }
 
     private void Update()
     {
         UpdateUI();
+    }
+
+    public IEnumerator GoAndStop()
+    {
+        isStop = !isStop;
+        tagger.ChangeTaggerState();
+        yield return new WaitForSeconds(Random.value * 5f);
     }
 
     public void EndGame()

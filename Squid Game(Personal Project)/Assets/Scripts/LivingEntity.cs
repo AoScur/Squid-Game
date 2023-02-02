@@ -44,7 +44,8 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
         agent.enabled = false;
         rb.isKinematic = false;
         rb.detectCollisions = true;
-        rb.AddForce(force);
+        rb.velocity = Vector3.zero;
+        rb.AddForce(force,ForceMode.Impulse);
     }
 
     public virtual void OnDie(Vector3 hitPoint, Vector3 hitNormal)

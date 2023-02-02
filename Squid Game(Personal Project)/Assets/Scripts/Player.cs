@@ -16,8 +16,6 @@ public class Player : LivingEntity
 
     private States state = States.None;
 
-    bool skip = false;
-
     public States State
     {
         get { return state; }
