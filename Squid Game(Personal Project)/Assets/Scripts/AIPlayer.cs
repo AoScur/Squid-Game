@@ -38,18 +38,17 @@ public class AIPlayer : LivingEntity
     public float proximate = 0f;
     public float coolDown = 0.25f;
 
+    Coroutine roofCoroutine = null;
     bool skip = false;
 
     [HideInInspector]
     public AIData aiData;
     public AIType type { get; private set; } // 현재 AI 종류
 
-    private States state = States.None;
-
-    public States State
+    public override States State
     {
         get { return state; }
-        private set
+        set
         {
             var prevState = state;
             state = value;
@@ -138,6 +137,7 @@ public class AIPlayer : LivingEntity
                     agent.enabled = true;
                     agent.isStopped = true;
                     agent.enabled = false;
+                    OnDie();
                     break;
             }
         }
@@ -154,8 +154,7 @@ public class AIPlayer : LivingEntity
     private void Start()
     {
         State = States.Idle;
-
-        StartCoroutine(StateChange());
+        StartStateChange();
     }
 
     //private void OnDrawGizmos()
@@ -238,6 +237,19 @@ public class AIPlayer : LivingEntity
                 animator.SetBool("OnPush", false);
                 skip = false;
             }
+        }
+    }
+
+    private void StartStateChange()
+    {        
+        roofCoroutine = StartCoroutine(StateChange());
+    }
+
+    private void StopStateChange()
+    {
+        if (roofCoroutine != null)
+        {
+            StopCoroutine(roofCoroutine);
         }
     }
 
@@ -386,6 +398,7 @@ public class AIPlayer : LivingEntity
         var hitNormal = (transform.position - target.transform.position).normalized;
 
         target.OnPush(hitPoint, hitNormal);
+        
     }
 
     public override void OnPush(Vector3 hitPoint, Vector3 hitNormal)
@@ -399,27 +412,16 @@ public class AIPlayer : LivingEntity
         base.OnPush(hitPoint, hitNormal);
     }
 
-    public override void OnDie(Vector3 hitPoint, Vector3 hitNormal)
+    public override void OnDie()
     {
         if (dead)
         {
             return;
         }
 
-        //hurtEffect.transform.position = hitPoint;
-        //hurtEffect.transform.rotation = Quaternion.LookRotation(hitNormal);
-        //hurtEffect.Play();
-
-        //zomAudioPlayer.PlayOneShot(hurtClip);
-        base.OnDie(hitPoint, hitNormal);
-
+        StopStateChange();
         animator.SetTrigger("Die");
-
-        //var colliders = GetComponents<Collider>();
-        //foreach (var collider in colliders)
-        //{
-        //    collider.enabled = false;
-        //}
+        base.OnDie();
     }
 
     public float RandomNumber(float[] probs)

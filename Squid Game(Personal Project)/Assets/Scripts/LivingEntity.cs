@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using static UnityEngine.GraphicsBuffer;
@@ -28,6 +29,8 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
     public bool dead { get; protected set; }
     public event Action onDeath;
 
+    public States state = States.None;
+    public virtual States State { get; set; }
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -41,14 +44,13 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
     public virtual void OnPush(Vector3 hitPoint, Vector3 hitNormal)
     {
         Vector3 force = hitNormal * 5f;
-        agent.enabled = false;
         rb.isKinematic = false;
         rb.detectCollisions = true;
         rb.velocity = Vector3.zero;
         rb.AddForce(force,ForceMode.Impulse);
     }
 
-    public virtual void OnDie(Vector3 hitPoint, Vector3 hitNormal)
+    public virtual void OnDie()
     {
         if (onDeath != null)
         {

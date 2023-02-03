@@ -3,100 +3,57 @@ using System.Collections.Generic;
 using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
+using System;
 
 public class Tagger : MonoBehaviour
 {
-    private float forntTurnSpeed;
+    private float frontTurnSpeed;
     private float backTurnSpeed = 2f;
 
     private float compareAngle = 10f;
 
-    public bool isKill = false;
+    [HideInInspector]
+    public static event Action<bool> OnKill;
+    private bool isFront = false;
 
-    public enum TaggerStates
-    {
-        Back,
-        Front,
-    }
+    private GameManager gm;
+    
 
     private void Start()
     {
-        forntTurnSpeed = Random.Range(1f, 3f);
+        gm = GameManager.instance;
+        frontTurnSpeed = UnityEngine.Random.Range(1f, 3f);
+        StartCoroutine(RotateTagger());
     }
 
-    private TaggerStates taggerState = TaggerStates.Back;
-
-    public TaggerStates TaggerState
+    IEnumerator RotateTagger()
     {
-        get { return taggerState; }
-        private set
+        while (!gm.isGameover)
         {
-            var prevState = taggerState;
-            taggerState = value;
-
-            if (prevState == taggerState)
-                return;
-
-            switch (taggerState)
+            if (!isFront)
             {
-                case TaggerStates.Back:
-                    {
-                        StartCoroutine(RotateBackImage());
-                        break;
-                    }
-                case TaggerStates.Front:
-                    {
-                        StartCoroutine(RotateFrontImage());
-                        break;
-                    }
+                while (Quaternion.Angle(transform.rotation, Quaternion.Euler(0, -180, 0)) > compareAngle)
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, -180, 0), frontTurnSpeed * Time.deltaTime);
+                    yield return null;
+                }
+                transform.rotation = Quaternion.Euler(0, -180, 0);
+                OnKill?.Invoke(true);
+                yield return new WaitForSeconds(UnityEngine.Random.Range(1f, 2f));
+                isFront = true;
+            }
+            else
+            {
+                OnKill?.Invoke(false);
+                while (Quaternion.Angle(transform.rotation, Quaternion.Euler(0, 0, 0)) > compareAngle)
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, 0), backTurnSpeed * Time.deltaTime);
+                    yield return null;
+                }
+                transform.rotation = Quaternion.Euler(0, 0, 0);
+                yield return new WaitForSeconds(UnityEngine.Random.Range(2f, 3f));
+                isFront = false;
             }
         }
     }
-
-    IEnumerator RotateFrontImage()
-    {
-        while (Quaternion.Angle(transform.rotation, Quaternion.Euler(0, -180, 0)) > compareAngle)
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, -180, 0), forntTurnSpeed * Time.deltaTime);
-            yield return null;
-        }
-        transform.rotation = Quaternion.Euler(0, -180, 0);
-        isKill = true;
-
-    }
-
-    IEnumerator RotateBackImage()
-    {
-        isKill = false;
-        while (Quaternion.Angle(transform.rotation, Quaternion.Euler(0, 0, 0)) > compareAngle) 
-            {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, 0), backTurnSpeed * Time.deltaTime);
-            yield return null;
-        }
-        transform.rotation = Quaternion.Euler(0, 0, 0);
-    }
-
-    public void ChangeTaggerState()
-    {
-        if(taggerState == TaggerStates.Back)
-        {
-            TaggerState = TaggerStates.Front;
-        }
-        else
-        {
-            TaggerState = TaggerStates.Back;
-        }
-    }
-    //private void Update()
-    //{
-    //    if (Input.GetKeyDown(KeyCode.F3))
-    //    {
-    //        TaggerState = TaggerStates.Front;
-    //    }
-    //    if (Input.GetKeyDown(KeyCode.F4))
-    //    {
-    //        TaggerState = TaggerStates.Back;
-    //    }
-    //}
 }

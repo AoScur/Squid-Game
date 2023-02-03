@@ -13,13 +13,12 @@ public class Player : LivingEntity
     private float distanceToTarget;
 
     public float coolDown = 0.25f;
+        
 
-    private States state = States.None;
-
-    public States State
+    public override States State
     {
         get { return state; }
-        private set
+        set
         {
             var prevState = state;
             state = value;
@@ -40,6 +39,7 @@ public class Player : LivingEntity
                 case States.OnPush:
                     break;
                 case States.Die:
+                    OnDie();
                     break;
             }
         }
@@ -58,11 +58,17 @@ public class Player : LivingEntity
     private void Start()
     {
         GameManager.targets.Add(this);
+        this.onDeath += () => GameManager.targets.Remove(this);
         State = States.Idle;
     }
 
     private void Update()
     {
+        if (dead)
+        {
+            return;
+        }
+
         if (playerInput.push)
         {
             State = States.Push;
@@ -80,17 +86,22 @@ public class Player : LivingEntity
 
     private void FixedUpdate()
     {
+        if (dead)
+        {
+            return;
+        }
+
         if (State == States.Push || State == States.OnPush)
             return;
 
         var input = new Vector3(playerInput.moveH, 0, playerInput.moveV);
         if (input.Equals(Vector3.zero))
         {
-            State = States.Run;
+            State = States.Idle;
         }
         else
         {
-            State = States.Idle;
+            State = States.Run;
         }
 
         playerRigidbody.MovePosition(transform.position + input * Time.deltaTime * speed);
@@ -133,7 +144,7 @@ public class Player : LivingEntity
     }
 
     public override void OnPush(Vector3 hitPoint, Vector3 hitNormal)
-    {
+    { 
         if (dead)
         {
             return;
@@ -143,21 +154,14 @@ public class Player : LivingEntity
         base.OnPush(hitPoint, hitNormal);
     }
 
-    public override void OnDie(Vector3 hitPoint, Vector3 hitNormal)
+    public override void OnDie()
     {
         if (dead)
         {
             return;
         }
-
-        //hurtEffect.transform.position = hitPoint;
-        //hurtEffect.transform.rotation = Quaternion.LookRotation(hitNormal);
-        //hurtEffect.Play();
-
-        //zomAudioPlayer.PlayOneShot(hurtClip);
-        base.OnDie(hitPoint, hitNormal);
-
         animator.SetTrigger("Die");
+        base.OnDie();
     }
 }
 

@@ -106,9 +106,9 @@ GameObject:
   - component: {fileID: 8175489932611838303}
   - component: {fileID: 8175489932611838272}
   - component: {fileID: 8175489932611838273}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Tagger
-  m_TagString: Untagged
+  m_TagString: Tagger
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -191,6 +191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd5861175488420498776b13b6540115, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isKill: 0
 --- !u!1 &8175489932688472880
 GameObject:
   m_ObjectHideFlags: 0

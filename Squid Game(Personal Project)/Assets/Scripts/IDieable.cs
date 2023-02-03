@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IDieable
 {
-    void OnDie(Vector3 hitPoint, Vector3 hitNormal);
+    void OnDie();
 }
