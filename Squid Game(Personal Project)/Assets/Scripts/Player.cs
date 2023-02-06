@@ -6,6 +6,7 @@ using static UnityEngine.GraphicsBuffer;
 
 public class Player : LivingEntity
 {
+    public LayerMask whatIsTarget;
     private PlayerInput playerInput;
     private Rigidbody playerRigidbody;
 
@@ -137,10 +138,27 @@ public class Player : LivingEntity
 
     public void Kick()
     {
-        //var hitPoint = target.GetComponent<CapsuleCollider>().ClosestPoint(transform.position);
-        //var hitNormal = (transform.position - target.transform.position).normalized;
+        var colliders = Physics.OverlapSphere(rightBall.transform.position, 0.3f, whatIsTarget);
 
-        //target.OnPush(hitPoint, hitNormal);
+        foreach(var collider in colliders)
+        {
+            var hitPoint = rightBall.GetComponent<CapsuleCollider>().ClosestPoint(transform.position);
+            var hitNormal = (transform.position - collider.transform.position).normalized;
+
+            collider.gameObject.GetComponent<LivingEntity>().OnPush(hitPoint, hitNormal);
+        }
+
+        hitEffect.transform.position = rightBall.transform.position;
+        hitEffect.Play();
+
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying)
+            return;
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(rightBall.transform.position, 0.3f);
     }
 
     public override void OnPush(Vector3 hitPoint, Vector3 hitNormal)

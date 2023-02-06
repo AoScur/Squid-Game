@@ -25,12 +25,17 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
     public NavMeshAgent agent;
     [HideInInspector]
     public float mass, speed, chaseSpeed, power;
+    public ParticleSystem hitEffect;
+
+    public GameObject rightBall;
 
     public bool dead { get; protected set; }
     public event Action onDeath;
 
     public States state = States.None;
     public virtual States State { get; set; }
+
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();

@@ -15,6 +15,7 @@ public class Tagger : MonoBehaviour
     [HideInInspector]
     public static event Action<bool> OnKill;
     private bool isFront = false;
+    private bool isFirstDelay = true;
 
     private GameManager gm;
     
@@ -30,6 +31,11 @@ public class Tagger : MonoBehaviour
     {
         while (!gm.isGameover)
         {
+            if(isFirstDelay)
+            {
+                yield return new WaitForSeconds(3f);
+                isFirstDelay = false;
+            }
             if (!isFront)
             {
                 while (Quaternion.Angle(transform.rotation, Quaternion.Euler(0, -180, 0)) > compareAngle)
@@ -51,7 +57,7 @@ public class Tagger : MonoBehaviour
                     yield return null;
                 }
                 transform.rotation = Quaternion.Euler(0, 0, 0);
-                yield return new WaitForSeconds(UnityEngine.Random.Range(2f, 3f));
+                yield return new WaitForSeconds(UnityEngine.Random.Range(3f, 5f));
                 isFront = false;
             }
         }

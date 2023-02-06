@@ -348,7 +348,7 @@ public class AIPlayer : LivingEntity
 
     private void RunOnlyBehavior()
     {
-        float[] probs = { 60, 40 };
+        float[] probs = { 70, 30 };
 
         switch (RandomNumber(probs))
         {
@@ -363,7 +363,7 @@ public class AIPlayer : LivingEntity
 
     private void RandomBehavior()
     {
-        float[] probs = { 60, 25, 15 };
+        float[] probs = { 70, 20, 10 };
 
         switch (RandomNumber(probs))
         {
@@ -381,7 +381,7 @@ public class AIPlayer : LivingEntity
 
     private void FightFirstBehavior()
     {
-        float[] probs = { 20, 10, 70 };
+        float[] probs = { 60, 10, 30 };
 
         switch (RandomNumber(probs))
         {
@@ -399,8 +399,12 @@ public class AIPlayer : LivingEntity
 
     public void Kick()
     {
-        var hitPoint = target.GetComponent<CapsuleCollider>().ClosestPoint(transform.position);
+        var hitPoint = rightBall.GetComponent<CapsuleCollider>().ClosestPoint(target.transform.position);
         var hitNormal = (transform.position - target.transform.position).normalized;
+
+        hitEffect.transform.position = hitPoint;
+        hitEffect.transform.rotation = Quaternion.LookRotation(hitNormal);
+        hitEffect.Play();
 
         target.OnPush(hitPoint, hitNormal);
 
