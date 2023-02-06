@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Timer : MonoBehaviour
 {
     public float timeRemaining = 2;
     public bool timerIsRunning = false;
+    public event Action onTimeOver;
 
     private void Start()
     {
         timerIsRunning = true;
+        GameManager.instance.onGameOver += EndGame;
     }
 
     private void Update()
@@ -24,6 +27,10 @@ public class Timer : MonoBehaviour
             {
                 timeRemaining = 0;
                 timerIsRunning = false;
+                if (onTimeOver != null)
+                {
+                    onTimeOver();
+                }
             }
         }
 
@@ -44,4 +51,8 @@ public class Timer : MonoBehaviour
         float seconds = Mathf.FloorToInt(timeToDisplay % 60);
     }
 
+    private void EndGame()
+    {
+        timerIsRunning = false;
+    }
 }

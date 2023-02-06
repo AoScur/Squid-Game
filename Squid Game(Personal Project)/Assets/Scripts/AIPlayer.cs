@@ -40,6 +40,7 @@ public class AIPlayer : LivingEntity
 
     Coroutine roofCoroutine = null;
     bool skip = false;
+    bool isGameOver = false;
 
     [HideInInspector]
     public AIData aiData;
@@ -59,7 +60,7 @@ public class AIPlayer : LivingEntity
             if (prevState == state)
                 return;
 
-     
+
             switch (state)
             {
                 case States.Idle:
@@ -153,6 +154,7 @@ public class AIPlayer : LivingEntity
 
     private void Start()
     {
+        GameManager.instance.onGameOver += EndGame;
         State = States.Idle;
         StartStateChange();
     }
@@ -167,6 +169,9 @@ public class AIPlayer : LivingEntity
 
     private void Update()
     {
+        if (isGameOver)
+            return;
+
         if (target != null)
         {
             if (State != States.Die)
@@ -241,7 +246,7 @@ public class AIPlayer : LivingEntity
     }
 
     private void StartStateChange()
-    {        
+    {
         roofCoroutine = StartCoroutine(StateChange());
     }
 
@@ -390,15 +395,15 @@ public class AIPlayer : LivingEntity
                 State = States.Chase;
                 break;
         }
-    }    
+    }
 
     public void Kick()
     {
-        var hitPoint = target.GetComponent<CapsuleCollider>().ClosestPoint(transform.position); 
+        var hitPoint = target.GetComponent<CapsuleCollider>().ClosestPoint(transform.position);
         var hitNormal = (transform.position - target.transform.position).normalized;
 
         target.OnPush(hitPoint, hitNormal);
-        
+
     }
 
     public override void OnPush(Vector3 hitPoint, Vector3 hitNormal)
@@ -447,5 +452,13 @@ public class AIPlayer : LivingEntity
             }
         }
         return probs.Length - 1;
+    }
+
+    private void EndGame()
+    {
+        isGameOver = true;        
+        StopStateChange();
+        if (State == States.Die || State == States.OnPush)
+            State = States.Idle;
     }
 }

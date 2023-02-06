@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Bson;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
@@ -22,6 +23,8 @@ public class GameManager : MonoBehaviour
 
     public static List<LivingEntity> targets = new List<LivingEntity>();
 
+    public event Action onGameOver;
+
     public bool isGameover { get; private set; }
 
     private void Awake()
@@ -36,7 +39,9 @@ public class GameManager : MonoBehaviour
     private void Start()
     {        
         var player = GameObject.FindWithTag("Player").GetComponent<Player>();
-        player.onDeath += EndGame;               
+        player.onDeath += EndGame;
+        var timer = GetComponent<Timer>();
+        timer.onTimeOver += EndGame;
     }
 
     private void Update()
@@ -46,9 +51,13 @@ public class GameManager : MonoBehaviour
 
     public void EndGame()
     {
+        if (onGameOver != null)
+        {
+            onGameOver();
+        }
         isGameover = true;
         
-        //UIManager.instance.SetActiveGameoverUI(true);
+        UIManager.instance.SetActiveGameoverUI(true);
     }
 
     private void UpdateUI()
