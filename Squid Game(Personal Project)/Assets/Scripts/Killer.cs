@@ -43,10 +43,15 @@ public class Killer : MonoBehaviour
         }
     }
 
-    private void Fire()
+    private void Update()
     {
-        int i = Random.Range(0, turrets.Length - 1);
-        
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+        var muzzleEffect = _Pool.Get();
+        muzzleEffect.transform.position = firePos[0].position;
+        muzzleEffect.Fire();
+
+        }
     }
 
     private MuzzleEffect CreateEffect()
