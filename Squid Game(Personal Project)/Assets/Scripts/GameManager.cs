@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -60,9 +61,34 @@ public class GameManager : MonoBehaviour
         UIManager.instance.SetActiveGameoverUI(true);
     }
 
+    public void Initialized()
+    {
+        foreach (var target in targets)
+        {
+            Destroy(target);
+        }
+        targets.Clear();
+    }
+
     private void UpdateUI()
     {
         UIManager.instance.UpdateSurvivorText(targets.Count);
     }
 
+    public void ShowRangking()
+    {
+
+    }
+
+    public void BackToTitle()
+    {        
+        SceneManager.LoadScene("TitleScene");
+        Initialized();
+    }  
+
+    public void ReStart()
+    {
+        Initialized();
+        SceneManager.LoadScene("PlayScene");
+    }
 }
