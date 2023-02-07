@@ -31,17 +31,8 @@ public class Killer : MonoBehaviour
     private void OnDisable()
     {
         Tagger.OnKill -= KillPlayer;
-        //GameManager.instance.onGameOver -= EndGame;
     }
 
-    private void Update()
-    {
-        for (int i = targets.Count - 1; i >= 0; i--)
-        {
-            var dir = (targets[i].transform.position+ new Vector3(0,1.3f,0))- firePos[3].position;
-        Debug.DrawRay(firePos[3].position, dir * 100, Color.red);
-        }
-    }
 
     private void KillPlayer(bool obj)
     {
@@ -72,16 +63,6 @@ public class Killer : MonoBehaviour
         }
     }
 
-    //private void Update()
-    //{
-    //    if(Input.GetKeyDown(KeyCode.Space))
-    //    {
-    //    var muzzleEffect = _Pool.Get();
-    //    muzzleEffect.transform.position = firePos[0].position;
-    //    muzzleEffect.Fire();
-
-    //    }
-    //}
 
     private MuzzleEffect CreateEffect()
     {

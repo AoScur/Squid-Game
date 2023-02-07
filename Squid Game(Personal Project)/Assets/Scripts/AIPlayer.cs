@@ -29,8 +29,8 @@ public class AIPlayer : LivingEntity
     private LivingEntity target;
 
     private Transform goalLinePos;
+    private Transform destinationPos;
 
-    private float distanceToGoalLine;
     private float distanceToTarget;
     public float pushRange = 1f;
     public float timer = 0f;
@@ -56,7 +56,7 @@ public class AIPlayer : LivingEntity
             state = value;
 
             Vector3 runDestination = transform.position;
-            runDestination.z = goalLinePos.position.z;
+            runDestination.z = destinationPos.position.z;
 
             if (prevState == state)
                 return;
@@ -147,6 +147,7 @@ public class AIPlayer : LivingEntity
     public override void Awake()
     {
         goalLinePos = GameObject.FindWithTag("GoalLine").GetComponent<Transform>();
+        destinationPos = GameObject.FindWithTag("Destination").GetComponent<Transform>();
         agent = GetComponent<NavMeshAgent>();
 
         base.Awake();
@@ -159,13 +160,19 @@ public class AIPlayer : LivingEntity
         StartStateChange();
     }
 
-    //private void OnDrawGizmos()
-    //{
-    //    if (!Application.isPlaying)
-    //        return;
-    //    Gizmos.color = Color.red;
-    //    Gizmos.DrawWireSphere(transform.position, 10f);
-    //}
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.CompareTag("GoalLine"))
+        {
+            Invoke("CrossGoalLine", 1f);
+        }
+    }
+
+    private void CrossGoalLine()
+    {
+        StopStateChange();
+        State = States.Idle;
+    }
 
     private void Update()
     {

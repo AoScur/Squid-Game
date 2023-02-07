@@ -51,6 +51,7 @@ public class GameManager : MonoBehaviour
     {        
         var player = GameObject.FindWithTag("Player").GetComponent<Player>();
         player.onDeath += EndGame;
+        player.onCrossGoaLine += EndGame;
         var timer = GetComponent<Timer>();
         timer.onTimeOver += EndGame;
     }

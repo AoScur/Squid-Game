@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using System;
 using static UnityEngine.GraphicsBuffer;
 
 public class Player : LivingEntity
@@ -9,7 +10,8 @@ public class Player : LivingEntity
     public LayerMask whatIsTarget;
     private PlayerInput playerInput;
 
-    
+    public event Action onCrossGoaLine;
+
     private float distanceToTarget;
 
     public float coolDown = 0.25f;
@@ -47,8 +49,6 @@ public class Player : LivingEntity
     public override void Awake()
     {
         playerInput = GetComponent<PlayerInput>();
-        //playerRigidbody = GetComponent<Rigidbody>();
-        //rb = GetComponent<Rigidbody>();
 
         base.Awake();
 
@@ -60,6 +60,17 @@ public class Player : LivingEntity
         GameManager.targets.Add(this);
         this.onDeath += () => GameManager.targets.Remove(this);
         State = States.Idle;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("GoalLine"))
+        {
+            if (onCrossGoaLine != null)
+            {
+                onCrossGoaLine();
+            }
+        }
     }
 
     private void Update()
@@ -146,14 +157,6 @@ public class Player : LivingEntity
 
             collider.gameObject.GetComponent<LivingEntity>().OnPush(hitPoint, hitNormal);
         }
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (!Application.isPlaying)
-            return;
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(rightBall.transform.position, 0.3f);
     }
 
     public override void OnPush(Vector3 hitPoint, Vector3 hitNormal)
