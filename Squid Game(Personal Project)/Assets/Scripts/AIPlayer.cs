@@ -139,7 +139,6 @@ public class AIPlayer : LivingEntity
                     agent.enabled = true;
                     agent.isStopped = true;
                     agent.enabled = false;
-                    OnDie();
                     break;
             }
         }
@@ -419,16 +418,16 @@ public class AIPlayer : LivingEntity
         base.OnPush(hitPoint, hitNormal);
     }
 
-    public override void OnDie()
+    public override void OnDie(Vector3 hitPoint, Vector3 hitNormal)
     {
         if (dead)
         {
             return;
         }
-
         StopStateChange();
+        State = States.Die;
         animator.SetTrigger("Die");
-        base.OnDie();
+        base.OnDie(hitPoint, hitNormal);
     }
 
     public float RandomNumber(float[] probs)

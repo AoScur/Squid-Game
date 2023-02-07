@@ -12,6 +12,8 @@ public class Killer : MonoBehaviour
 
     private List<LivingEntity> targets;
 
+    public LayerMask targetsLayerMask;
+
     private IObjectPool<MuzzleEffect> _Pool;
 
     private void Awake()
@@ -32,6 +34,15 @@ public class Killer : MonoBehaviour
         //GameManager.instance.onGameOver -= EndGame;
     }
 
+    private void Update()
+    {
+        for (int i = targets.Count - 1; i >= 0; i--)
+        {
+            var dir = (targets[i].transform.position+ new Vector3(0,1.3f,0))- firePos[3].position;
+        Debug.DrawRay(firePos[3].position, dir * 100, Color.red);
+        }
+    }
+
     private void KillPlayer(bool obj)
     {
         if (obj)
@@ -40,11 +51,22 @@ public class Killer : MonoBehaviour
             {
                 if (targets[i].GetComponent<LivingEntity>().State != LivingEntity.States.Idle)
                 {
-                    targets[i].State = LivingEntity.States.Die;
-                    var muzzleEffect = _Pool.Get();
-                    muzzleEffect.GetComponent<ParticleSystem>().Play();
-                    muzzleEffect.transform.position = firePos[Random.Range(0,firePos.Length-1)].position;
-                    muzzleEffect.Fire();
+                    RaycastHit hitInfo;
+                    
+                    var dir = (targets[i].transform.position + new Vector3(0, 1.4f, 0)) - firePos[3].position;
+                    if (Physics.Raycast(firePos[3].position, dir, out hitInfo,100f,targetsLayerMask))
+                    {
+                        if (hitInfo.collider.gameObject == targets[i].gameObject)
+                        {
+                            targets[i].OnDie(hitInfo.point,dir);
+                            //ÃÑ ½î´Â ÀÌÆåÆ®
+                            var fireTurretIndex = Random.Range(0, firePos.Length - 1);
+                            var muzzleEffect = _Pool.Get();
+                            muzzleEffect.GetComponent<ParticleSystem>().Play();
+                            muzzleEffect.transform.position = firePos[fireTurretIndex].position;
+                            muzzleEffect.Fire();
+                        }
+                    }
                 }
             }
         }

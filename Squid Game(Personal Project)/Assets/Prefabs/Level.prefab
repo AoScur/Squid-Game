@@ -179,7 +179,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7444831c3bc5dd647a044fd92f3c15ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AIPlayerCount: 30
+  AIPlayerCount: 50
   aiPrefab:
   - {fileID: 2390955124532828598, guid: 6e41e6a259d29ad4db88c9812fcc0d3a, type: 3}
   - {fileID: 2362430753489953610, guid: 5189205f9541c434aaaf7c99b0de2ebc, type: 3}

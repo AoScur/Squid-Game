@@ -39,7 +39,6 @@ public class Player : LivingEntity
                 case States.OnPush:
                     break;
                 case States.Die:
-                    OnDie();
                     break;
             }
         }
@@ -168,14 +167,14 @@ public class Player : LivingEntity
         base.OnPush(hitPoint, hitNormal);
     }
 
-    public override void OnDie()
+    public override void OnDie(Vector3 hitPoint, Vector3 hitNormal)
     {
         if (dead)
         {
             return;
         }
         animator.SetTrigger("Die");
-        base.OnDie();
+        base.OnDie(hitPoint, hitNormal);
     }
 }
 

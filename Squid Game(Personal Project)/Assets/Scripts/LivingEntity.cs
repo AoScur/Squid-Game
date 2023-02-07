@@ -61,7 +61,7 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
         hitEffect.Hit();
     }
 
-    public virtual void OnDie()
+    public virtual void OnDie(Vector3 hitPoint, Vector3 hitNormal)
     {
         if (onDeath != null)
         {
@@ -69,5 +69,11 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
         }
 
         dead = true;
+
+        var bloodSprayEffect = GameManager.blood_Pool.Get();
+        bloodSprayEffect.transform.position = hitPoint;
+        bloodSprayEffect.transform.rotation = Quaternion.LookRotation(hitNormal);
+        bloodSprayEffect.GetComponent<ParticleSystem>().Play();
+        bloodSprayEffect.Bleeding();
     }
 }
