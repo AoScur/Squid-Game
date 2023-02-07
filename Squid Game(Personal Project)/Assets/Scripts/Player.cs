@@ -8,9 +8,8 @@ public class Player : LivingEntity
 {
     public LayerMask whatIsTarget;
     private PlayerInput playerInput;
-    private Rigidbody playerRigidbody;
 
-    private Animator animator;
+    
     private float distanceToTarget;
 
     public float coolDown = 0.25f;
@@ -46,12 +45,13 @@ public class Player : LivingEntity
         }
     }
 
-    private void Awake()
+    public override void Awake()
     {
         playerInput = GetComponent<PlayerInput>();
-        playerRigidbody = GetComponent<Rigidbody>();
-        animator = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody>();
+        //playerRigidbody = GetComponent<Rigidbody>();
+        //rb = GetComponent<Rigidbody>();
+
+        base.Awake();
 
         speed = 5f;
     }
@@ -105,7 +105,7 @@ public class Player : LivingEntity
             State = States.Run;
         }
 
-        playerRigidbody.MovePosition(transform.position + input * Time.deltaTime * speed);
+        rb.MovePosition(transform.position + input * Time.deltaTime * speed);
         animator.SetFloat("MoveH", playerInput.moveH);
         animator.SetFloat("MoveV", playerInput.moveV);
     }
@@ -147,10 +147,6 @@ public class Player : LivingEntity
 
             collider.gameObject.GetComponent<LivingEntity>().OnPush(hitPoint, hitNormal);
         }
-
-        hitEffect.transform.position = rightBall.transform.position;
-        hitEffect.Play();
-
     }
 
     private void OnDrawGizmos()

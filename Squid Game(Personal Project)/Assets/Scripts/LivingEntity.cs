@@ -1,9 +1,11 @@
+using Newtonsoft.Json.Bson;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Pool;
 using static UnityEngine.GraphicsBuffer;
 
 public class LivingEntity : MonoBehaviour, IPushable, IDieable
@@ -18,14 +20,12 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
         OnPush,
         Die,
     }
-
+    [HideInInspector]
+    public Animator animator;
     [HideInInspector]
     public Rigidbody rb;
     [HideInInspector]
-    public NavMeshAgent agent;
-    [HideInInspector]
     public float mass, speed, chaseSpeed, power;
-    public ParticleSystem hitEffect;
 
     public GameObject rightBall;
 
@@ -35,10 +35,10 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
     public States state = States.None;
     public virtual States State { get; set; }
 
-
-    private void Awake()
+    public virtual void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        animator= GetComponent<Animator>();
     }
 
     protected virtual void OnEnable()
@@ -53,6 +53,12 @@ public class LivingEntity : MonoBehaviour, IPushable, IDieable
         rb.detectCollisions = true;
         rb.velocity = Vector3.zero;
         rb.AddForce(force,ForceMode.Impulse);
+
+        var hitEffect = GameManager.hit_Pool.Get();
+        hitEffect.transform.position = hitPoint;
+        hitEffect.transform.rotation = Quaternion.LookRotation(hitNormal);
+        hitEffect.GetComponent<ParticleSystem>().Play();
+        hitEffect.Hit();
     }
 
     public virtual void OnDie()

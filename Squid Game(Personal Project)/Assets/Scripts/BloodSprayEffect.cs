@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
-public class HitEffect : MonoBehaviour
+public class BloodSprayEffect : MonoBehaviour
 {
-    private IObjectPool<HitEffect> _ManagedPool;
+    private IObjectPool<BloodSprayEffect> _ManagedPool;
 
-    public void SetManagedPool(IObjectPool<HitEffect> pool)
+    public void SetManagedPool(IObjectPool<BloodSprayEffect> pool)
     {
         _ManagedPool = pool;
     }
 
-    public void Hit()
+    public void Bleeding()
     {
         Invoke("DestroyEffect", 1f);
     }

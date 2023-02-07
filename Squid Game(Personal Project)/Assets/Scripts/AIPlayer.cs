@@ -22,12 +22,13 @@ public class AIPlayer : LivingEntity
         Speedy,
         Strongy,
     }
+
+    public NavMeshAgent agent;
+
     public LayerMask whatIsTarget;
     private LivingEntity target;
 
     private Transform goalLinePos;
-
-    private Animator animator;
 
     private float distanceToGoalLine;
     private float distanceToTarget;
@@ -144,12 +145,12 @@ public class AIPlayer : LivingEntity
         }
     }
 
-    private void Awake()
+    public override void Awake()
     {
-        animator = GetComponent<Animator>();
         goalLinePos = GameObject.FindWithTag("GoalLine").GetComponent<Transform>();
         agent = GetComponent<NavMeshAgent>();
-        rb = GetComponent<Rigidbody>();
+
+        base.Awake();
     }
 
     private void Start()
@@ -402,9 +403,6 @@ public class AIPlayer : LivingEntity
         var hitPoint = rightBall.GetComponent<CapsuleCollider>().ClosestPoint(target.transform.position);
         var hitNormal = (transform.position - target.transform.position).normalized;
 
-        hitEffect.transform.position = hitPoint;
-        hitEffect.transform.rotation = Quaternion.LookRotation(hitNormal);
-        hitEffect.Play();
 
         target.OnPush(hitPoint, hitNormal);
 

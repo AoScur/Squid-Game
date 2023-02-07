@@ -19,11 +19,17 @@ public class Killer : MonoBehaviour
         _Pool = new ObjectPool<MuzzleEffect>(CreateEffect,OnGetEffect,OnReleaseEffect,OnDestroyEffect,maxSize:40);
     }
 
-    void Start()
+    private void Start()
     {
         Tagger.OnKill += KillPlayer;
         targets = GameManager.targets;
+        GameManager.instance.onGameOver += EndGame;
+    }
 
+    private void OnDisable()
+    {
+        Tagger.OnKill -= KillPlayer;
+        //GameManager.instance.onGameOver -= EndGame;
     }
 
     private void KillPlayer(bool obj)
@@ -44,16 +50,16 @@ public class Killer : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-        var muzzleEffect = _Pool.Get();
-        muzzleEffect.transform.position = firePos[0].position;
-        muzzleEffect.Fire();
+    //private void Update()
+    //{
+    //    if(Input.GetKeyDown(KeyCode.Space))
+    //    {
+    //    var muzzleEffect = _Pool.Get();
+    //    muzzleEffect.transform.position = firePos[0].position;
+    //    muzzleEffect.Fire();
 
-        }
-    }
+    //    }
+    //}
 
     private MuzzleEffect CreateEffect()
     {
@@ -75,5 +81,10 @@ public class Killer : MonoBehaviour
     private void OnDestroyEffect(MuzzleEffect effect)
     {
         Destroy(effect.gameObject);
+    }
+
+    private void EndGame()
+    {
+        _Pool.Clear();
     }
 }

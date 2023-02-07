@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3014533777459957669}
   - component: {fileID: 3099804277931773859}
   - component: {fileID: 3100208321296766539}
+  - component: {fileID: 7663641728846576728}
   m_Layer: 0
   m_Name: Shockwave
   m_TagString: Untagged
@@ -4882,3 +4883,15 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &7663641728846576728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3009354696842159039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95cc3c1d846c3554cbbf0e42b12aa89f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
