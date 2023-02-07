@@ -36,6 +36,7 @@ public class Killer : MonoBehaviour
                 {
                     targets[i].State = LivingEntity.States.Die;
                     var muzzleEffect = _Pool.Get();
+                    muzzleEffect.GetComponent<ParticleSystem>().Play();
                     muzzleEffect.transform.position = firePos[Random.Range(0,firePos.Length-1)].position;
                     muzzleEffect.Fire();
                 }
